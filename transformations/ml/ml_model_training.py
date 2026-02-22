@@ -16,7 +16,7 @@ def ml_model_training():
     security restrictions. This dataset provides the prepared training data.
     """
     # Read training data
-    df = spark.read.table("ml_training_data_[votrePrenom_Nom]")
+    df = spark.read.table("ml_training_data")
     
     # Split into train and test
     train_df = df.filter("is_training = true")
@@ -89,6 +89,11 @@ def ml_model_training():
             F.when(F.col("airport_dropoff_flag") == 1, 5.0).otherwise(0.0) +
             # Passenger count
             (F.col("passenger_count") * 0.5)
+
+            # distance rush interaction improvements
+            + (F.col("distance_rush_interaction") * 1.5)
+            # distance squared improvements
+            + (F.col("distance_squared") * 0.02)
         )
     )
     

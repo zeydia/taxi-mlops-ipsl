@@ -24,7 +24,7 @@ def silver_taxi_features():
     - Applies data quality expectations
     """
     return (
-        spark.readStream.table("bronze_taxi_trips_[votrePrenom_Nom]")
+        spark.readStream.table("bronze_taxi_trips")
         .filter("VendorID IS NOT NULL")
         
         # Calculate trip duration in minutes
@@ -65,5 +65,26 @@ def silver_taxi_features():
         .withColumn(
             "is_airport_dropoff",
             F.col("DOLocationID").isin([1, 132, 138])
+        )
+
+        # My new features
+        .withColumn(
+            "is_rush_hour",
+            F.when(
+                ((F.col("pickup_hour") >= 7) & (F.col("pickup_hour") <= 10)) |
+                ((F.col("pickup_hour") >= 16) & (F.col("pickup_hour") <= 19)),
+                1
+            ).otherwise(0)
+        )
+        .withColumn(
+            "is_weekend",
+            F.when(F.col("pickup_day_of_week").isin([1,7]), 1).otherwise(0)
+        )
+        .withColumn(
+            "fare_per_mile",
+            F.when(
+                F.col("trip_distance") > 0,
+                F.col("fare_amount") / F.col("trip_distance")
+            ).otherwise(0)
         )
     )

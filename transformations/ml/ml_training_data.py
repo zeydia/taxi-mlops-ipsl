@@ -14,7 +14,7 @@ def ml_training_data():
     - Adds train/test split indicator
     """
     return (
-        spark.read.table("silver_taxi_features_[votrePrenom_Nom]")
+        spark.read.table("silver_taxi_features")
         .filter("""
             trip_distance > 0 AND trip_distance < 100 AND
             trip_duration_minutes > 0 AND trip_duration_minutes < 180 AND
@@ -48,8 +48,23 @@ def ml_training_data():
             "RatecodeID",
             
             # Date for partitioning
-            "pickup_date"
+            "pickup_date",
+
+            # New features
+            "is_rush_hour",
+            "is_weekend",
+            "fare_per_mile"
         )
         # Add train/test split (80/20 split based on hash)
         .withColumn("is_training", (F.hash("pickup_date", "PULocationID") % 100) < 80)
+
+        # Improvements
+        .withColumn(
+            "distance_rush_interaction",
+            F.col("trip_distance") * F.col("is_rush_hour")
+        )
+        .withColumn(
+            "distance_squared",
+            F.col("trip_distance") * F.col("trip_distance")
+        )
     )

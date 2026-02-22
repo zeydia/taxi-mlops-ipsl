@@ -66,8 +66,8 @@ jobs:
       
       - name: Trigger Pipeline Update
         env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_PROD_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_PROD_TOKEN }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           PIPELINE_ID: ${{ secrets.PIPELINE_ID }}
         run: |
           python cicd/trigger_pipeline.py --action start-and-wait ${{ github.event.inputs.full_refresh && '--full-refresh' || '' }}
@@ -75,8 +75,8 @@ jobs:
       - name: Pipeline Status
         if: always()
         env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_PROD_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_PROD_TOKEN }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           PIPELINE_ID: ${{ secrets.PIPELINE_ID }}
         run: |
           python cicd/trigger_pipeline.py --action status
